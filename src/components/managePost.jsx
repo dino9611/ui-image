@@ -66,8 +66,9 @@ class ManagePost extends Component {
             alert('image harus diisi')
         }
     }
-    onBtnEditClick=(id)=>{
-        this.setState({editselected:id})
+    onBtnEditClick=(id,caption)=>{
+        this.setState({editselected:id, captionEdit:caption})
+        console.log(this.state.captionEdit)
     }
     editImageChange=(event)=>{
         var file=event.target.files[0]
@@ -85,35 +86,27 @@ class ManagePost extends Component {
         }
     }
     onBtnSaveEditPostClick=(id)=>{
-        var captionid='caption'+id
-        console.log(this.refs[captionid].value)
-        this.setState({captionEdit:this.refs[captionid].value})
-        console.log(this.state.captionEdit)
-        
-        
-        if(this.state.editImageFile){
-            var formdata=new FormData()
-            var Headers={
-                headers:
-                {'Content-Type':'multipart/form-data'}
-            }
-            var data={
-                caption:this.state.captionEdit,
-                userId:1
-            }
-            console.log(this.state.captionEdit)
-            formdata.append('image',this.state.editImageFile)
-            formdata.append('data',JSON.stringify(data))
-            Axios.put(API_URL+'/post/editpost/'+id,formdata,Headers)
-            .then((res)=>{
-                this.setState({listPosts:res.data,captionEdit:'',editselected:-1})
-            }).catch((err)=>{
-                console.log(err)
-            })
-        }else{
-            alert('isi image')
-
+        var formData = new FormData()
+        var headers = {
+            headers: 
+            {'Content-Type': 'multipart/form-data'}
         }
+
+        var data = {
+            caption: this.state.captionEdit,
+        }
+
+       
+        formData.append('image', this.state.editImageFile)
+        formData.append('data', JSON.stringify(data))
+
+        Axios.put(API_URL + "/post/editpost/" + id, formData, headers)
+        .then((res) => {
+            this.setState({ listPosts: res.data, editselected: -1,editImageFileName:'Select Image',editImageFile:undefined, })
+        })
+        .catch((err) =>{
+            console.log(err)
+        })
     }
     onBtnDeletePostClick=(id)=>{
         Axios.delete(API_URL+'/post/deletepost/'+id)
@@ -145,7 +138,7 @@ class ManagePost extends Component {
                     
                     <td>{item.caption}</td>
                     <td>{item.userid}</td>
-                    <td><button className='btn btn-primary'onClick={()=>this.onBtnEditClick(index)} >Edit</button></td>
+                    <td><button className='btn btn-primary'onClick={()=>this.onBtnEditClick(index,item.caption)} >Edit</button></td>
                     <td><button className='btn btn-danger' onClick={()=>this.onBtnDeletePostClick(item.id)}>delete</button></td>
                 </tr>
                 
